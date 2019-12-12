@@ -16,5 +16,6 @@ uint16_t dataADC;
 uint16_t DataADCH(uint8_t channel);
 uint16_t DataADCL(uint8_t channel);
 uint16_t DigitalRAW(uint8_t channel);
+uint16_t CalibratingS0(uint8_t channel);
 
 #endif /* ANALOG_H_ */

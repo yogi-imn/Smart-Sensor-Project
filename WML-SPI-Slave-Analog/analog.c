@@ -11,7 +11,8 @@
 uint8_t channel,DataL,DataH;
 uint8_t DRAW[3];
 uint8_t i;
-uint8_t threshold;
+uint16_t ADCMax=0,ADCMin=0;
+uint16_t threshold=511;
 
 void ADCInit(void)
 {
@@ -30,19 +31,20 @@ uint16_t ReadADC(uint8_t channel)
 
 	DataL = ADCL;
 	DataH = ADCH;
-	dataADC = ADCH*256 + ADCL;
+	dataADC = DataH*256 + DataL;
 	return dataADC;
 }
 
 uint16_t DataADCL(uint8_t channel){
 	ReadADC(channel);
-	return ADCL;
+	return DataL;
 	//return ADCL;
 }
 
 uint16_t DataADCH(uint8_t channel){
 	ReadADC(channel);
-	return ADCH;
+	return DataH;
+	//return ADCH;
 }
 
 uint16_t DigitalRAW(uint8_t channel){
@@ -55,4 +57,15 @@ uint16_t DigitalRAW(uint8_t channel){
 		DRAW[i] = 1;
 	}
 	return DRAW[i];
+}
+
+uint16_t CalibratingSensor(uint8_t channel,uint16_t ADCMax,uint16_t ADCMin){
+	ReadADC(channel);
+	if (dataADC > ADCMax){
+		ADCMax = dataADC;
+	}
+	else if (dataADC < ADCMin){
+		ADCMin = dataADC;
+	}
+	return ADCMax;
 }
