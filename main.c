@@ -5,6 +5,12 @@
  *      Author: Yogi Iman
  */
 
+//hallo from ara
+//ceritanya program
+
+//yogi anak senja
+//rupane Aji koyok repository
+
 #include <stdio.h>
 #include <stdint.h>
 #include <ctype.h>
