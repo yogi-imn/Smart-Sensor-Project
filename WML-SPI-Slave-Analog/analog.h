@@ -11,11 +11,12 @@
 #include<avr/io.h>
 unsigned int ADCIN (unsigned char channel);
 void ADCInit(void);
-uint16_t ReadADC(uint8_t channel);
-uint16_t dataADC;
-uint16_t DataADCH(uint8_t channel);
-uint16_t DataADCL(uint8_t channel);
-uint16_t DigitalRAW(uint8_t channel);
-uint16_t CalibratingS0(uint8_t channel);
+void ReadADC(uint8_t channel, uint8_t *DataL, uint8_t *DataH, uint16_t *Data10);
+void DataADC (void);
+uint8_t DigitalRAW(uint8_t channel);
+void BacaADC (uint8_t channel);
+uint8_t ADCHigh (uint8_t channel);
+uint8_t ADCLow (uint8_t channel);
+void CalibratingSensor(uint8_t channel);
 
 #endif /* ANALOG_H_ */

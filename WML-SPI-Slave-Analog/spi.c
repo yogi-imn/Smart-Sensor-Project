@@ -8,7 +8,6 @@
 #include "analog.h"
 #define DDR_SPI DDRB
 #define DD_MISO DDB3
-uint8_t rikues;
 
 char SPI_KirimHuruf(char *huruf)
 {
@@ -40,7 +39,6 @@ char SPI_SlaveReceive(char dataADC)
 	/* Wait for reception complete */
 	SPDR=dataADC; // confirm to master already received
 	while(!(SPSR & (1<<SPIF)));
-	rikues = SPDR;
 	/* Return data register */
 	return SPDR;
 }

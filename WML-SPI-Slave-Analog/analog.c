@@ -8,11 +8,13 @@
 #include "analog.h"
 #include <avr/io.h>
 #include <util/delay.h>
-uint8_t channel,DataL,DataH;
+uint8_t channel,Lower,Higher;
 uint8_t DRAW[3];
 uint8_t i;
-uint16_t ADCMax=0,ADCMin=0;
-uint16_t threshold=511;
+uint16_t ADCMax[3]={0,0,0},ADCMin[3]={1023,1023,1023};
+//uint16_t ADCMax1=0,ADCMax2=0,ADCMax3=0;
+//uint16_t ADCMin1=1023,ADCMin2=1023,ADCMin3=1023;
+uint16_t dataADC[3],threshold[3],sepuluhbit[3];
 
 void ADCInit(void)
 {
@@ -21,7 +23,7 @@ void ADCInit(void)
 	ADMUX |=(1<<REFS0)|channel; //get ref from VCC & activate channel 0
 	ADCSRA|=(1<<ADEN);	//enable ADC
 }
-uint16_t ReadADC(uint8_t channel)
+/*void ReadADC(uint8_t channel, uint8_t *DataL, uint8_t *DataH, uint16_t *Data10)
 {
 	ADMUX &= ~(0x1F); //reset bit 0-4 ADMUX
 	ADMUX |= channel; //mengakses data dari channel analog yang dipilih
@@ -29,28 +31,53 @@ uint16_t ReadADC(uint8_t channel)
 	while(!(ADCSRA&(1<<ADIF)));
 	ADCSRA |= (1<<ADIF);
 
-	DataL = ADCL;
-	DataH = ADCH;
-	dataADC = DataH*256 + DataL;
-	return dataADC;
-}
+	Lower = ADCL;
+	Higher = ADCH;
+	*DataL = Lower;
+	*DataH = Higher;
+	*Data10 = Higher*256 + Lower;
+}*/
 
-uint16_t DataADCL(uint8_t channel){
-	ReadADC(channel);
-	return DataL;
-	//return ADCL;
-}
+void BacaADC (uint8_t channel)
+{
+	ADMUX &= ~(0x1F); //reset bit 0-4 ADMUX
+	ADMUX |= channel; //mengakses data dari channel analog yang dipilih
+	ADCSRA|= (1<<ADSC);
+	while(!(ADCSRA&(1<<ADIF)));
+	ADCSRA |= (1<<ADIF);
 
-uint16_t DataADCH(uint8_t channel){
-	ReadADC(channel);
-	return DataH;
-	//return ADCH;
-}
-
-uint16_t DigitalRAW(uint8_t channel){
-	ReadADC(channel);
 	i=channel;
-	if (dataADC < threshold){
+	Lower = ADCL;
+	Higher = ADCH;
+	sepuluhbit[i] = Higher*256 + Lower;
+}
+
+uint8_t ADCHigh (uint8_t channel)
+{
+	i=channel;
+	BacaADC(i);
+	return Higher;
+}
+
+uint8_t ADCLow (uint8_t channel)
+{
+	i=channel;
+	BacaADC(i);
+	return Lower;
+}
+
+/*void DataADC (void){
+	for(i=0;i<3;i++){
+		ReadADC(i,0,0,&dataADC[i]);
+	}
+}*/
+
+uint8_t DigitalRAW(uint8_t channel){
+	i=channel;
+	//ReadADC(i,0,0,&dataADC[i]);
+	BacaADC(i);
+	//if (dataADC[i] < threshold[i]){
+	if (sepuluhbit[i] < threshold[i]){
 		DRAW[i] = 0;
 	}
 	else{
@@ -59,13 +86,16 @@ uint16_t DigitalRAW(uint8_t channel){
 	return DRAW[i];
 }
 
-uint16_t CalibratingSensor(uint8_t channel,uint16_t ADCMax,uint16_t ADCMin){
-	ReadADC(channel);
-	if (dataADC > ADCMax){
-		ADCMax = dataADC;
+void CalibratingSensor(uint8_t channel){
+	i=channel;
+	//ReadADC(i,0,0,&dataADC[i]);
+	BacaADC(i);
+	//if (dataADC[i] > ADCMax[i]){
+	if (sepuluhbit[i] > ADCMax[i]){
+		ADCMax[i] = sepuluhbit[i];
 	}
-	else if (dataADC < ADCMin){
-		ADCMin = dataADC;
+	else if (sepuluhbit[i] < ADCMin[i]){
+		ADCMin[i] = sepuluhbit[i];
 	}
-	return ADCMax;
+	threshold[i] = (ADCMax[i]+ADCMin[i])/2;
 }
