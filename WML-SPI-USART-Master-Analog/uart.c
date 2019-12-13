@@ -7,6 +7,7 @@
 
 #include <avr/io.h>
 #include <stdio.h>
+#include <util/delay.h>
 #include "uart.h"
 
 void USARTInit(void) {
@@ -19,26 +20,22 @@ void USARTInit(void) {
 	UCSR0C = (0 << USBS0) | (3 << UCSZ00);
 }
 volatile unsigned char USARTGetChar(void) {
-	//Wait for data to be received
-	while (!(UCSR0A & (1 << RXC0)))
-		;
+	//Wait for data for to be received
+	while(!(UCSR0A & (1<<RXC0)));
 	return UDR0;
 }
 void USARTPutChar(unsigned char data) {
 	//Wait for empty transmit buffer
-	while (!(UCSR0A & (1 << UDRE0)))
-		;
+	while(!(UCSR0A & (1<<UDRE0)));
 	UDR0 = data;
 }
-void USARTPutStr(char *s) {
-	char i = 0;
-	char c;
-	while ((c = *(s + (i++))) != 0)
-		USARTPutChar(c);
+void USARTPutStr(char *text) {
+	while(*text){
+		USARTPutChar(*text++);
+	}
 }
-void USARTBanner(void) {
-	USARTPutStr("\n\r");
-	USARTPutStr("**************************\n\r");
-	USARTPutStr("******* test usart *******\n\r");
-	USARTPutStr("**************************\n\r");
+void USARTPutNum(int16_t number){
+	char buff[20];
+	sprintf(buff,"%d",number);
+	USARTPutStr(buff);
 }

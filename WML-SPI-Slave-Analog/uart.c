@@ -20,21 +20,21 @@ void USARTInit(void) {
 	UCSR0C = (0 << USBS0) | (3 << UCSZ00);
 }
 volatile unsigned char USARTGetChar(void) {
-	//Wait for data to be received
-	while (!(UCSR0A & (1 << RXC0)));
+	//Wait for data for to be received
+	while(!(UCSR0A & (1<<RXC0)));
 	return UDR0;
 }
 void USARTPutChar(unsigned char data) {
 	//Wait for empty transmit buffer
-	while (!(UCSR0A & (1 << UDRE0)));
+	while(!(UCSR0A & (1<<UDRE0)));
 	UDR0 = data;
 }
 void USARTPutStr(char *text) {
-	while (*text){
+	while(*text){
 		USARTPutChar(*text++);
 	}
 }
-void USARTPutNum(uint16_t number){
+void USARTPutNum(int16_t number){
 	char buff[20];
 	sprintf(buff,"%d",number);
 	USARTPutStr(buff);
